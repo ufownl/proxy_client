@@ -51,19 +51,17 @@ struct read_handler {
 };
 
 struct write_handler {
-    socket_ptr pdst;
-    buf_ptr pbuf;
-    std::size_t pos;
-    std::size_t size;
+    socket_ptr   pdst;
+    byte_vec_ptr pbuf;
+    std::size_t  pos;
 
-    write_handler(socket_ptr pdst, std::size_t size)
+    write_handler(socket_ptr pdst, byte_vec_ptr pbuf)
         : pdst(pdst)
-        , pbuf(new buf_t())
-        , pos(0)
-        , size(size) {}
+        , pbuf(pbuf)
+        , pos(0) {}
     byte_t* raw_buf_ptr() { return &(*pbuf)[0]; }
     boost::asio::mutable_buffers_1 asio_buffer() { 
-        return boost::asio::buffer(raw_buf_ptr() + pos, size - pos);
+        return boost::asio::buffer(raw_buf_ptr() + pos, pbuf->size() - pos);
     }
     void async_write_some() { pdst->async_write_some(asio_buffer(), *this); }
     void operator()(

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -17,11 +18,13 @@
 using boost::asio::ip::tcp;
 
 typedef unsigned char byte_t;
+typedef std::vector<byte_t> byte_vector;
+typedef boost::shared_ptr<byte_vector> byte_vec_ptr;
 
 struct content_processor {
-    virtual void operator()(
-      const byte_t* psrc, std::size_t size, byte_t* pdst) {
-        std::copy(psrc, psrc + size, pdst);
+    virtual byte_vec_ptr operator()(
+      const byte_t* psrc, std::size_t size) {
+        return byte_vec_ptr(new byte_vector(psrc, psrc + size));
     }
 };
 
