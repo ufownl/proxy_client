@@ -1,5 +1,19 @@
 #include "handler.h"
 
+void connect_handler::operator()(
+  const boost::system::error_code& err, tcp::resolver::iterator server_it) {
+    try {
+        if (!err) {
+            read_handler client_reader(
+                pclient_socket, pserver_socket, pencoder);
+            client_reader.async_read_some();
+            read_handler server_reader(
+                pserver_socket, pclient_socket, pdecoder);
+            server_reader.async_read_some();
+        }
+    } catch (...) {}
+}
+
 void read_handler::close() {
     boost::system::error_code err;
     psrc->shutdown(tcp::socket::shutdown_both, err);

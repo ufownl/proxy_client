@@ -5,12 +5,6 @@
 
 const unsigned NUM_THREAD = 8;
 
-void start(
-    socket_ptr pclient_socket,
-    tcp::resolver::iterator server_it,
-    content_processor_ptr pencoder,
-    content_processor_ptr pdecoder);
-
 int main() {
     try {
         std::cout << "Initializing..." << std::endl;
@@ -47,9 +41,12 @@ int main() {
             boost::system::error_code err;
             acceptor.accept(*pclient_socket, err);
             if (!err) {
-                iosvc.post(
-                    boost::bind(start,
-                        pclient_socket, server_it, pencoder, pdecoder));
+                connect_handler connect_hdler(
+                    pclient_socket, pencoder, pdecoder);
+                boost::asio::async_connect(
+                    *connect_hdler.pserver_socket,
+                    server_it,
+                    connect_hdler);
             }
         }
     }
@@ -63,20 +60,4 @@ int main() {
                   << std::endl;
     }
     return 0;
-}
-
-void start(
-  socket_ptr pclient_socket,
-  tcp::resolver::iterator server_it,
-  content_processor_ptr pencoder,
-  content_processor_ptr pdecoder) {
-    try {
-        boost::asio::io_service& iosvc = pclient_socket->get_io_service();
-        socket_ptr pserver_socket(new tcp::socket(iosvc));
-        boost::asio::connect(*pserver_socket, server_it);
-        read_handler client_reader(pclient_socket, pserver_socket, pencoder);
-        client_reader.async_read_some();
-        read_handler server_reader(pserver_socket, pclient_socket, pdecoder);
-        server_reader.async_read_some();
-    } catch (...) {}
 }
