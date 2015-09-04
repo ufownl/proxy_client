@@ -9,14 +9,6 @@ int main() {
     try {
         std::cout << "Initializing..." << std::endl;
         config cfg = get_cfg();
-        content_processor_ptr pencoder, pdecoder;
-        if (cfg.key_src.size()) {
-            pencoder.reset(new encoder(cfg.key_src));
-            pdecoder.reset(new decoder(cfg.key_src));
-        } else {
-            pencoder.reset(new content_processor);
-            pdecoder.reset(new content_processor);
-        }
 
         boost::asio::io_service iosvc;
         boost::asio::io_service::work work(iosvc);
@@ -41,6 +33,14 @@ int main() {
             boost::system::error_code err;
             acceptor.accept(*pclient_socket, err);
             if (!err) {
+                content_processor_ptr pencoder, pdecoder;
+                if (cfg.key_src.size()) {
+                    pencoder.reset(new encoder(cfg.key_src));
+                    pdecoder.reset(new decoder(cfg.key_src));
+                } else {
+                    pencoder.reset(new content_processor);
+                    pdecoder.reset(new content_processor);
+                }
                 connect_handler connect_hdler(
                     pclient_socket, pencoder, pdecoder);
                 boost::asio::async_connect(
