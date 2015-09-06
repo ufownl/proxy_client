@@ -16,10 +16,10 @@ void connect_handler::operator()(
 
 void read_handler::close() {
     boost::system::error_code err;
-    psrc->shutdown(tcp::socket::shutdown_both, err);
-    pdst->shutdown(tcp::socket::shutdown_both, err);
-    psrc->close(err);
-    pdst->close(err);
+    if (pdst->is_open()) {
+        pdst->shutdown(tcp::socket::shutdown_both, err);
+        pdst->close(err);
+    }
 }
 
 void read_handler::operator()(
