@@ -1,12 +1,3 @@
-This is a simple console-based proxy client written in C++03. You also need the Boost C++ Libraries to successfully build the program. No other dependencies exist.
+This branch adds to the master branch the capability of en/decrypting the message forwarded between the local client and the remote server. The cryptographic algorithm used is Advanced Encryption Standard (AES) working at the Cipher Feedback (CFB) mode. OpenSSL’s implementation of the algorithm is used. Consequently, this branch has an additional dependency on the OpenSSL library.
 
-The program works as follows. It listens on a specified local port. For each accepted connection from a local client (such as a web browser), it opens a new connection to a remote server on a specified port. The program then forwards data between the local client and the remote server. During forwarding, you may choose to transform the data for purposes like encryption. See content_processor.h.
-
-The program uses a config file named "cfg" located in the same directory as the executable file. You are able to configure the local port, the remote host and port, and an optional key source used for possible data encryption. The config file has the following format:  
-local_port=...  
-remote_host=...  
-remote_port=...  
-key_src=...  
-The order of the entries doesn't matter. remote_host may be specified in either a name or an IP address. See config.h and config.cpp.
-
-Have fun :)
+The value of the "key_src" entry in the config file specifies the key for AES. If the value is empty or the entire "key_src" entry is not present in the config file, no encryption will be performed.
