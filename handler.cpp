@@ -16,10 +16,8 @@ void connect_handler::operator()(
 
 void read_handler::close() {
     boost::system::error_code err;
-    if (pdst->is_open()) {
-        pdst->shutdown(tcp::socket::shutdown_both, err);
-        pdst->close(err);
-    }
+    pdst->shutdown(tcp::socket::shutdown_both, err);
+    pdst->cancel(err);
 }
 
 void read_handler::operator()(
