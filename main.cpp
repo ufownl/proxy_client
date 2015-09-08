@@ -29,7 +29,7 @@ int main() {
         std::cout << "Up and running..." << std::endl;
         while (true) {
             socket_ptr pclient_socket(
-                new tcp::socket(iosvc));
+                new socket_t(iosvc));
             boost::system::error_code err;
             acceptor.accept(*pclient_socket, err);
             if (!err) {

@@ -28,5 +28,31 @@ struct content_processor {
     }
 };
 
-typedef boost::shared_ptr<tcp::socket> socket_ptr;
+struct socket_t: tcp::socket {
+    socket_t(boost::asio::io_service& iosvc)
+        : tcp::socket(iosvc) {}
+    template <typename Buf, typename Handler>
+    void async_read_some(const Buf& buf, const Handler& handler) {
+        boost::lock_guard<boost::mutex> lock(mut_);
+        tcp::socket::async_read_some(buf, handler);
+    }
+    template <typename Buf, typename Handler>
+    void async_write_some(const Buf& buf, const Handler& handler) {
+        boost::lock_guard<boost::mutex> lock(mut_);
+        tcp::socket::async_write_some(buf, handler);
+    }
+    void shutdown(shutdown_type what, boost::system::error_code& err) {
+        boost::lock_guard<boost::mutex> lock(mut_);
+        tcp::socket::shutdown(what, err);
+    }
+    void cancel(boost::system::error_code& err) {
+        boost::lock_guard<boost::mutex> lock(mut_);
+        tcp::socket::cancel(err);
+    }
+
+private:
+    boost::mutex mut_;
+};
+
+typedef boost::shared_ptr<socket_t> socket_ptr;
 typedef boost::shared_ptr<content_processor> content_processor_ptr;
