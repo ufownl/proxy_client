@@ -18,7 +18,7 @@ struct connect_handler {
       content_processor_ptr pencoder,
       content_processor_ptr pdecoder)
         : pclient_socket(pclient_socket)
-        , pserver_socket(new tcp::socket(pclient_socket->get_io_service()))
+        , pserver_socket(new socket_t(pclient_socket->get_io_service()))
         , pencoder(pencoder)
         , pdecoder(pdecoder) {}
     void operator()(
